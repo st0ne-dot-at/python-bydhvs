@@ -414,6 +414,8 @@ class BYDHVS:
         tower['minCellVoltage_mV'] = self.buf2int16SI(byteArray, 7)
         tower['maxCellVoltageCell'] = byteArray[9]
         tower['minCellVoltageCell'] = byteArray[10]
+        tower['maxCellTemp'] = byteArray[12]
+        tower['minCellTemp'] = byteArray[14]
         tower['maxCellTempCell'] = byteArray[15]
         tower['minCellTempCell'] = byteArray[16]
 
@@ -426,6 +428,15 @@ class BYDHVS:
         for i in range(16):
             voltage = self.buf2int16SI(byteArray, 101 + i * 2)
             tower['cellVoltages'].append(voltage)
+
+        tower['chargeTotal'] = self.buf2int32US(byteArray, 33)
+        tower['dischargeTotal'] = self.buf2int32US(byteArray, 37)
+        tower['eta'] = tower['dischargeTotal'] / tower['chargeTotal']
+        tower['batteryVolt'] = round(self.buf2int16SI(byteArray, 45) * 1.0 / 10.0, 1)
+        tower['outVolt'] = round(self.buf2int16SI(byteArray, 51) * 1.0 / 10.0, 1)
+        tower['hvsSOCDiagnosis'] = round((self.buf2int16SI(byteArray, 53) * 1.0 / 10.0),1)
+        tower['soh'] = round((self.buf2int16SI(byteArray, 55) * 1.0),1)
+        tower['state'] = str(byteArray[59]) + str(byteArray[60])
 
     def parse_packet6(self, data: bytes, towerNumber = 0) -> None:
         """Parse packet 6 containing additional cell voltages.
