@@ -1,43 +1,66 @@
-"""Sample code to use the wrapper for interacting with the BYDHVS API."""
 import asyncio
-from bydhvs import BYDHVS
-
-byd_host = "192.168.16.254"
-byd_port = 8080
+from bydhvs import BYDHVS  # Assuming the BYDHVS class is in a file named bydhvs.py
 
 
 async def main():
-    """The main part of the example script."""
-    batt = BYDHVS(byd_host, byd_port)
-    #Get the data
-    await batt.poll()
+    # Replace '192.168.1.100' with the IP address of your BYD HVS battery system
+    battery_ip = '192.168.16.254'
+    battery = BYDHVS(ip_address=battery_ip)
 
-    data = batt.get_data()
+    try:
+        # Perform the polling to retrieve data
+        await battery.poll()
 
-    print("BYD HVS Batteriedaten:")
-    print(f"Seriennummer: {data['serial_number']}")
-    print(f"BMU Firmware: {data['bmu_firmware']}")
-    print(f"BMS Firmware: {data['bms_firmware']}")
-    print(f"Module: {data['modules']}")
-    print(f"Türme: {data['towers']}")
-    print(f"Netztyp: {data['grid_type']}")
-    print(f"SOC: {data['soc']}%")
-    print(f"Maximale Spannung: {data['max_voltage']} V")
-    print(f"Minimale Spannung: {data['min_voltage']} V")
-    print(f"SOH: {data['soh']}%")
-    print(f"Strom: {data['current']} A")
-    print(f"Batteriespannung: {data['battery_voltage']} V")
-    print(f"Höchste Temperatur: {data['max_temperature']} °C")
-    print(f"Niedrigste Temperatur: {data['min_temperature']} °C")
-    print(f"Leistung: {data['power']} W")
-    print(f"Fehler: {data['error']}")
-    print(f"Anzahl der Balancing-Zellen: {data['balancing_count']}")
-    print("Einzelzellenspannungen (mV):")
-    for idx, voltage in enumerate(data['cell_voltages'], start=1):
-        print(f"  Zelle {idx}: {voltage} mV")
-    print("Einzelzellentemperaturen (°C):")
-    for idx, temp in enumerate(data['cell_temperatures'], start=1):
-        print(f"  Zelle {idx}: {temp} °C")
+        # Get the collected data
+        data = battery.get_data()
 
-if __name__ == "__main__":
+        # Print the retrieved data
+        print("Battery Data:")
+        print(f"Serial Number: {data['serial_number']}")
+        print(f"BMU Firmware: {data['bmu_firmware']}")
+        print(f"BMS Firmware: {data['bms_firmware']}")
+        print(f"Modules: {data['modules']}")
+        print(f"Towers: {data['towers']}")
+        print(f"Grid Type: {data['grid_type']}")
+        print(f"SOC: {data['soc']}%")
+        print(f"Max Voltage: {data['max_voltage']} V")
+        print(f"Min Voltage: {data['min_voltage']} V")
+        print(f"SOH: {data['soh']}%")
+        print(f"Current: {data['current']} A")
+        print(f"Battery Voltage: {data['battery_voltage']} V")
+        print(f"Max Temperature: {data['max_temperature']} °C")
+        print(f"Min Temperature: {data['min_temperature']} °C")
+        print(f"Battery Temperature: {data['battery_temperature']} °C")
+        print(f"Voltage Difference: {data['voltage_difference']} V")
+        print(f"Power: {data['power']} W")
+        print(f"Error: {data['error_number']}")
+        print(f"Charge Total: {data['charge_total']} Ah")
+        print(f"Discharge Total: {data['discharge_total']} Ah")
+        print(f"ETA: {data['eta']}")
+        print(f"Battery Type: {data['battery_type']}")
+        print(f"Inverter Type: {data['inverter_type']}")
+        print("\nTower Attributes:")
+        for idx, tower in enumerate(data['tower_attributes']):
+            print(f"\nTower {idx + 1}:")
+            print(f"  Max Cell Voltage (mV): {tower.get('maxCellVoltage_mV')}")
+            print(f"  Min Cell Voltage (mV): {tower.get('minCellVoltage_mV')}")
+            print(f"  Max Cell Voltage Cell: {tower.get('maxCellVoltageCell')}")
+            print(f"  Min Cell Voltage Cell: {tower.get('minCellVoltageCell')}")
+            print(f"  Max Cell Temp Cell: {tower.get('maxCellTempCell')}")
+            print(f"  Min Cell Temp Cell: {tower.get('minCellTempCell')}")
+            print(f"  Balancing Status: {tower.get('balancingStatus')}")
+            print(f"  Balancing Count: {tower.get('balancingCount')}")
+            print(f"  Cell Voltages: {tower.get('cellVoltages')}")
+            print(f"  Cell Temperatures: {tower.get('cellTemperatures')}")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+    finally:
+        # Ensure the connection is closed properly
+        await battery.close()
+
+
+if __name__ == '__main__':
     asyncio.run(main())
+    
