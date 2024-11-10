@@ -796,11 +796,77 @@ class BYDHVS:
                 if data and self.check_packet(data):
                     self.parse_packet8(data, towerNumber=1)
                     self.myState = 0  # Polling completed
+                    # Check if we have more than 128 cells
+                    if self.hvsNumCells > 128:
+                        self.myState = 23
+                    else:
+                        self.myState = 0  # Polling completed
                 else:
                     _LOGGER.error("Invalid or no data received in state 22")
                     self.myState = 0
                     await self.close()
                     return
+
+                # Handle additional cells for more than 128 cells (e.g., 5 modules)
+                if self.myState == 23:
+                    # State 23: Send request 9 - Switch to second pass
+                    await self.send_request(self.myRequests[9])
+                    data = await self.receive_response()
+                    if data and self.check_packet(data):
+                        self.myState = 24
+                    else:
+                        _LOGGER.error("Invalid or no data received in state 11")
+                        self.myState = 0
+                        await self.close()
+                        return
+
+                    # State 24: Send request 16 - Start measurement
+                    await self.send_request(self.myRequests[16])
+                    data = await self.receive_response()
+                    if data and self.check_packet(data):
+                        # Wait time as per original code (e.g., 3 seconds)
+                        await asyncio.sleep(3)
+                        self.myState = 25
+                    else:
+                        _LOGGER.error("Invalid or no data received in state 24")
+                        self.myState = 0
+                        await self.close()
+                        return
+
+                    # State 25: Send request 11
+                    await self.send_request(self.myRequests[11])
+                    data = await self.receive_response()
+                    if data and self.check_packet(data):
+                        self.myState = 26
+                    else:
+                        _LOGGER.error("Invalid or no data received in state 24")
+                        self.myState = 0
+                        await self.close()
+                        return
+
+                    # State 26: Send request 12 and parse with parse_packet12 for tower 1
+                    await self.send_request(self.myRequests[12])
+                    data = await self.receive_response()
+                    if data and self.check_packet(data):
+                        self.parse_packet12(data, towerNumber=1)
+                        self.myState = 27
+                    else:
+                        _LOGGER.error("Invalid or no data received in state 26")
+                        self.myState = 0
+                        await self.close()
+                        return
+
+                    # State 27: Send request 13 and parse with parse_packet13 for tower 1
+                    await self.send_request(self.myRequests[13])
+                    data = await self.receive_response()
+                    if data and self.check_packet(data):
+                        self.parse_packet13(data, towerNumber=1)
+                        self.myState = 0  # Polling completed
+                    else:
+                        _LOGGER.error("Invalid or no data received in state 27")
+                        self.myState = 0
+                        await self.close()
+                        return
 
         # Close the connection
         await self.close()
