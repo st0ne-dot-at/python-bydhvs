@@ -16,6 +16,17 @@ Usage
 
 The file ``example.py`` contains an example about how to use this module.
 
+Build
+-----
+To build dev prepare system:
+
+    $ python -m pip install --upgrade pip
+    $ pip install build
+
+build package:
+  
+    $ python -m build
+
 License
 -------
 
