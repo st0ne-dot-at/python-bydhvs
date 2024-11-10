@@ -591,7 +591,7 @@ class BYDHVS:
             data = await self.receive_response()
             if data and self.check_packet(data):
                 # Wait time as per original code (e.g., 8 seconds)
-                await asyncio.sleep(8)
+                await asyncio.sleep(3)
                 self.myState = 6
             else:
                 _LOGGER.error("Invalid or no data received in state 5")
@@ -735,7 +735,7 @@ class BYDHVS:
                 data = await self.receive_response()
                 if data and self.check_packet(data):
                     # Wait time as per original code (e.g., 8 seconds)
-                    await asyncio.sleep(8)
+                    await asyncio.sleep(3)
                     self.myState = 17
                 else:
                     _LOGGER.error("Invalid or no data received in state 16")
