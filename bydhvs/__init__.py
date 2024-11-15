@@ -44,6 +44,7 @@ class BYDHVS:
         self.hvsBMUB = ""
         self.hvsBMS = ""
         self.hvsModules = 0
+        self.hvsModuleCellCount = 0
         self.hvsTowers = 0
         self.hvsGrid = ""
         self.hvsA = 0
@@ -366,10 +367,16 @@ class BYDHVS:
         if self.hvsBattType == 0:  # HVL
             self.hvsNumCells = 0
             self.hvsNumTemps = 0
+            self.hvsModuleCellCount = 0
+            self.hvsModuleCellTempCount = 0
         elif self.hvsBattType == 1:  # HVM
+            self.hvsModuleCellCount = 16
+            self.hvsModuleCellTempCount = 8
             self.hvsNumCells = self.hvsModules * 16
             self.hvsNumTemps = self.hvsModules * 8
         elif self.hvsBattType == 2:  # HVS
+            self.hvsModuleCellCount = 32
+            self.hvsModuleCellTempCount = 12 
             self.hvsNumCells = self.hvsModules * 32
             self.hvsNumTemps = self.hvsModules * 12
         else:
@@ -378,8 +385,10 @@ class BYDHVS:
 
         if self.hvsBattType_fromSerial == "LVS":
             self.hvsBattType = "LVS"
+            self.hvsModuleCellCount = 7
             self.hvsNumCells = self.hvsModules * 7
             self.hvsNumTemps = 0
+            self.hvsModuleCellTempCount = 0
 
         if self.hvsBattType_fromSerial == "LVS":
             if self.hvsInvType < len(self.myINVs):
@@ -892,6 +901,8 @@ class BYDHVS:
             "bmu_firmware_B": self.hvsBMUB,
             "bms_firmware": self.hvsBMS,
             "modules": self.hvsModules,
+            "ModuleCellCount": self.hvsModuleCellCount,
+            "ModuleCellTempCount": self.hvsModuleCellTempCount,
             "towers": self.hvsTowers,
             "grid_type": self.hvsGrid,
             "soc": self.hvsSOC,

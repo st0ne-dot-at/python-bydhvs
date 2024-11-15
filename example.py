@@ -20,6 +20,8 @@ async def main():
         print(f"BMU Firmware: {data['bmu_firmware']}")
         print(f"BMS Firmware: {data['bms_firmware']}")
         print(f"Modules: {data['modules']}")
+        print(f"ModuleCellCount: {data['ModuleCellCount']}")
+        print(f"ModuleCellTempCount: {data['ModuleCellTempCount']}")
         print(f"Towers: {data['towers']}")
         print(f"Grid Type: {data['grid_type']}")
         print(f"SOC: {data['soc']}%")
