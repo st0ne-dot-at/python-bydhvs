@@ -45,6 +45,7 @@ class BYDHVS:
         self.hvsBMS = ""
         self.hvsModules = 0
         self.hvsModuleCellCount = 0
+        self.hvsModuleCellTempCount = 0
         self.hvsTowers = 0
         self.hvsGrid = ""
         self.hvsA = 0
