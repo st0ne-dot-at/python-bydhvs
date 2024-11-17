@@ -48,26 +48,20 @@ async def main():
         print(f"Inverter Type: {data['inverter_type']}")
         for idx, tower in enumerate(data['tower_attributes']):
             print(f"\nTower {idx + 1}:")
-            print(f"  Max Cell Voltage (mV): {
-                tower.get('max_cell_voltage_mv')}"
-                )
-            print(f"  Min Cell Voltage (mV): {
-                tower.get('min_cell_voltage_mv')}"
-                )
-            print(f"  Max Cell Voltage Cell: No. {
-                tower.get('max_cell_voltage_cell')}"
-                )
-            print(f"  Min Cell Voltage Cell: No. {
-                tower.get('min_cell_voltage_cell')}"
-                )
+            print(f"""  Max Cell Voltage (mV): {
+                tower.get('max_cell_voltage_mv')}""")
+            print(f"""  Min Cell Voltage (mV): {
+                tower.get('min_cell_voltage_mv')}""")
+            print(f"""  Max Cell Voltage Cell: No. {
+                tower.get('max_cell_voltage_cell')}""")
+            print(f"""  Min Cell Voltage Cell: No. {
+                tower.get('min_cell_voltage_cell')}""")
             print(f"  Max Cell Temp: {tower.get('max_cell_temp')}°C")
             print(f"  Min Cell Temp: {tower.get('min_cell_temp')}°C")
-            print(f"  Max Cell Temp Cell: No. {
-                tower.get('max_cell_temp_cell')}"
-                )
-            print(f"  Min Cell Temp Cell: No. {
-                tower.get('min_cell_temp_cell')}"
-                )
+            print(f"""  Max Cell Temp Cell: No. {
+                tower.get('max_cell_temp_cell')}""")
+            print(f"""  Min Cell Temp Cell: No. {
+                tower.get('min_cell_temp_cell')}""")
             print(f"  Balancing Status: {tower.get('balancing_status')}")
             print(f"  Balancing Count: {tower.get('balancing_count')}")
             print(f"  Total Charge: {tower['charge_total']}")
