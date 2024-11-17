@@ -132,6 +132,15 @@ class BYDHVS:
             'switch_pass': bytes.fromhex("01100100000306444542554700176f"),
             # Request 16
             'switch_to_box_2': bytes.fromhex("01100550000204000281000853"),
+            'switch_to_box_3': bytes.fromhex("01100550000204000381005993"),
+            # BMU
+            'EVT_MSG_0_0': bytes.fromhex("011005a000020400008100A6D7"),
+            # BMS tower 1
+            'EVT_MSG_0_1': bytes.fromhex("011005a000020400018100f717"),
+            # BMS tower 2
+            'EVT_MSG_0_2': bytes.fromhex("011005a0000204000281000717"),
+            # BMS tower 3
+            'EVT_MSG_0_3': bytes.fromhex("011005a00002040003810056D7"),
         }
 
         self.my_errors = [
@@ -151,6 +160,25 @@ class BYDHVS:
             "Temperature sensor error",
             "High temperature during discharging (cells)",
             "Low temperature during discharging (cells)",
+        ]
+
+        self.stat_tower = [
+            "Battery Over Voltage",                         # Bit 0
+            "Battery Under Voltage",                        # Bit 1
+            "Cells OverVoltage",                            # Bit 2
+            "Cells UnderVoltage",                           # Bit 3
+            "Cells Imbalance",                              # Bit 4
+            "Charging High Temperature(Cells)",             # Bit 5
+            "Charging Low Temperature(Cells)",              # Bit 6
+            "DisCharging High Temperature(Cells)",          # Bit 7
+            "DisCharging Low Temperature(Cells)",           # Bit 8
+            "Charging OverCurrent(Cells)",                  # Bit 9
+            "DisCharging OverCurrent(Cells)",               # Bit 10
+            "Charging OverCurrent(Hardware)",               # Bit 11
+            "Short Circuit",                                # Bit 12
+            "Inversly Connection",                          # Bit 13
+            "Interlock switch Abnormal",                    # Bit 14
+            "AirSwitch Abnormal"                            # Bit 15
         ]
 
         self.my_inverters = [
@@ -404,6 +432,15 @@ class BYDHVS:
             )
         tower['soh'] = round(self.buf2int16_si(data, 55), 1)
         tower['state'] = f"{data[59]}{data[60]}"
+        # tower['state_string'] = self.stat_tower[tower['state']]
+
+        tower['state_string'] = "; ".join(
+            [
+                err
+                for i, err in enumerate(self.stat_tower)
+                if int(tower['state']) & (1 << i)
+            ]
+        ) or "No Error"
 
         # Cell voltages (Bytes 101 to 132) for cells 1 to 16
         tower['cell_voltages'] = [
