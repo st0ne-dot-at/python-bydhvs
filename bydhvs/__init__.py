@@ -275,8 +275,7 @@ class BYDHVS:
 
     def parse_packet0(self, data: bytes) -> None:
         """Parse packet 0 containing serial number and firmware versions."""
-        hvs_serial = data[3:22].decode('ascii').strip()
-        self.hvs_serial = hvs_serial
+        self.hvs_serial = data[3:22].decode('ascii').strip()
 
         # Hardware type
         hardware_type = data[5]
