@@ -1,6 +1,6 @@
 """Example for bydhvs"""
 import asyncio
-from bydhvs import BYDHVS
+from bydhvs import BYDHVS, BYDHVSError
 
 
 async def main():
@@ -81,13 +81,11 @@ async def main():
             print(f"  Cell Voltages: {tower.get('cell_voltages')}")
             print(f"  Cell Temperatures: {tower.get('cell_temperatures')}")
 
-    except Exception as e:
+    except BYDHVSError as e:
         print(f"An error occurred: {e}")
-
     finally:
         # Ensure the connection is closed properly
         await battery.close()
-
 
 if __name__ == '__main__':
     asyncio.run(main())
