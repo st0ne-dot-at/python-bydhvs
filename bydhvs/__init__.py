@@ -771,7 +771,7 @@ class BYDHVS:
             "power": self.hvs_power,
             "error_number": self.hvs_error,
             "error_string": self.hvs_error_string,
-            "param_T": self.hvs_param_t,
+            "param_t": self.hvs_param_t,
             "output_voltage": self.hvs_out_volt,
             "charge_total": self.hvs_charge_total,
             "discharge_total": self.hvs_discharge_total,
