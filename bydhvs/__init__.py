@@ -123,7 +123,7 @@ class BYDHVS:
             # Request 2
             'read_battery_info': bytes.fromhex("010300100003040e"),
             # Request 3 and 10
-            'start_measurement': bytes.fromhex("0110055000020400018100f853"),
+            'start_measure_box_1': bytes.fromhex("0110055000020400018100f853"),
             # Request 4 and 11
             'read_measurement_status': bytes.fromhex("010305510001d517"),
             # Requests 5-8 and 12-15
@@ -131,8 +131,8 @@ class BYDHVS:
             # Request 9
             'switch_pass': bytes.fromhex("01100100000306444542554700176f"),
             # Request 16
-            'switch_to_box_2': bytes.fromhex("01100550000204000281000853"),
-            'switch_to_box_3': bytes.fromhex("01100550000204000381005993"),
+            'start_measure_box_2': bytes.fromhex("01100550000204000281000853"),
+            'start_measure_box_3': bytes.fromhex("01100550000204000381005993"),
             # BMU
             'EVT_MSG_0_0': bytes.fromhex("011005a000020400008100A6D7"),
             # BMS tower 1
@@ -526,7 +526,6 @@ class BYDHVS:
             13: self.state13_send_request11,
             14: self.state14_send_request12,
             15: self.state15_send_request13,
-            16: self.state16_switch_tower,
         }
 
         while self.my_state != 0:
@@ -586,7 +585,12 @@ class BYDHVS:
 
     async def state5_start_measurement(self) -> None:
         """State 5: Start measurement and proceed with detailed queries."""
-        await self.send_request(self.my_requests['start_measurement'])
+        if self.current_tower == 0:
+            await self.send_request(self.my_requests['start_measure_box_1'])
+        elif self.current_tower == 1:
+            await self.send_request(self.my_requests['start_measure_box_2'])
+        elif self.current_tower == 2:
+            await self.send_request(self.my_requests['start_measure_box_3'])
         data = await self.receive_response()
         if data and self.check_packet(data):
             # Wait time as per original code (e.g., 8 seconds)
@@ -656,9 +660,6 @@ class BYDHVS:
             # Check if we have more than 128 cells
             if self.hvs_num_cells > 128:
                 self.my_state = 11
-            # if x towerconfig has less than 5 modules
-            elif self.hvs_towers - 1 > self.current_tower:
-                self.my_state = 16  # Proceed to second tower
             else:
                 self.my_state = 0  # Polling completed
         else:
@@ -670,10 +671,12 @@ class BYDHVS:
     async def state11_send_request9(self) -> None:
         """Handle additional cells for more than 128 cells (e.g., 5 modules)"""
         # State 11: Send request 9 - Switch to second pass
-        if self.current_tower > 1:
-            await self.send_request(self.my_requests['switch_to_box_2'])
-        else:
-            await self.send_request(self.my_requests['switch_pass'])
+        if self.current_tower == 0:
+            await self.send_request(self.my_requests['start_measure_box_1'])
+        elif self.current_tower == 1:
+            await self.send_request(self.my_requests['start_measure_box_2'])
+        elif self.current_tower == 2:
+            await self.send_request(self.my_requests['start_measure_box_3'])
         data = await self.receive_response()
         if data and self.check_packet(data):
             self.my_state = 12
@@ -724,25 +727,13 @@ class BYDHVS:
         data = await self.receive_response()
         if data and self.check_packet(data):
             self.parse_packet13(data, self.current_tower)
-            if self.hvs_towers - 1 > self.current_tower:
-                self.my_state = 16
+            if self.current_tower + 1 < self.hvs_towers:
                 self.current_tower += 1
+                self.my_state = 5
             else:
-                self.my_state = 0  # Polling completed
+                self.my_state = 0  # Letzter Turm erreicht
         else:
             _LOGGER.error("Invalid or no data received in state 15")
-            self.my_state = 0
-
-    async def state16_switch_tower(self) -> None:
-        """Handle second tower"""
-        await self.send_request(self.my_requests['switch_to_box_2'])
-        data = await self.receive_response()
-        if data and self.check_packet(data):
-            # Wait time as per original code (e.g., 8 seconds)
-            await asyncio.sleep(self.SLEEP_TIME)
-            self.my_state = 4
-        else:
-            _LOGGER.error("Invalid or no data received in state 16")
             self.my_state = 0
 
     def get_data(self) -> dict:
